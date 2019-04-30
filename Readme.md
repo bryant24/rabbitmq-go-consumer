@@ -24,7 +24,7 @@ package main
 
 import (
 	"fmt"
-	rgc "github.com/bryant24/rabbit-go-consumer"
+	rgc "github.com/bryant24/rabbitmq-go-consumer"
 )
 
 func main() {
