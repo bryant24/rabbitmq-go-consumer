@@ -1,8 +1,11 @@
 package rabbitmq_go_consumer
 
-type ConsumerFunc func(string)
+import "github.com/streadway/amqp"
+
+type ConsumerFunc func(*amqp.Delivery)
 
 type Consumer struct {
+	autoAck  bool
 	stopChan chan bool
 	closed   bool
 	queue    *Mqueue
@@ -16,9 +19,17 @@ func NewTaskConsumer(queue *Mqueue) *Consumer {
 	return consumer
 }
 
+func (c *Consumer) AutoAck(auto bool) {
+	c.queue.autoAck = auto
+}
+
+func (c *Consumer) Ack(ack bool) {
+
+}
+
 func (c *Consumer) StartConsumer() {
-	c.queue.Consume(func(msg string) {
-		go c.Callback(msg)
+	c.queue.Consume(func(d amqp.Delivery) {
+		go c.Callback(&d)
 	})
 }
 

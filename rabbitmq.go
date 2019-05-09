@@ -5,7 +5,7 @@ import (
 	"log"
 )
 
-type messageConsumer func(string)
+type messageConsumer func(amqp.Delivery)
 
 type Mqueue struct {
 	Url          string
@@ -14,6 +14,8 @@ type Mqueue struct {
 	connection   *amqp.Connection
 	channel      *amqp.Channel
 	closed       bool
+	autoAck      bool
+	Delivery     <-chan amqp.Delivery
 
 	consumers []messageConsumer
 }
@@ -95,10 +97,10 @@ func (q *Mqueue) declareQueue() {
 }
 
 func (q *Mqueue) registerQueueConsumer() (<-chan amqp.Delivery, error) {
-	msgs, err := q.channel.Consume(
+	delivery, err := q.channel.Consume(
 		q.Name,
 		"",
-		true,
+		q.autoAck,
 		false,
 		false,
 		false,
@@ -108,17 +110,17 @@ func (q *Mqueue) registerQueueConsumer() (<-chan amqp.Delivery, error) {
 		logError("Consuming messages from Mqueue failed", err)
 	}
 
-	return msgs, err
+	return delivery, err
 }
 
-func (q *Mqueue) executeMessageConsumer(err error, consumer messageConsumer, deliveries <-chan amqp.Delivery, isRecovery bool) {
+func (q *Mqueue) executeMessageConsumer(err error, consumer messageConsumer, delivery <-chan amqp.Delivery, isRecovery bool) {
 	if err == nil {
 		if !isRecovery {
 			q.consumers = append(q.consumers, consumer)
 		}
 		go func() {
-			for delivery := range deliveries {
-				consumer(string(delivery.Body[:]))
+			for d := range delivery {
+				consumer(d)
 			}
 		}()
 	}
