@@ -32,8 +32,10 @@ func main() {
 
 	mqSession := rgc.NewQueue("amqp://admin:admin@192.168.1.100:5672/render_mq", "Test")
 	tc := rgc.NewTaskConsumer(mqSession)
-	tc.Callback = func(msg string) {
-		fmt.Println("This is the go routine job handler", msg)
+	tc.AutoAck(false)
+	tc.Callback = func(d *amqp.Delivery) {
+		fmt.Println("This is the go routine job handler", string(d.Body))
+		d.Ack(false)
 	}
 	go tc.StartConsumer()
 
