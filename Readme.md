@@ -28,6 +28,7 @@ import (
 )
 
 func main() {
+    //consumer
 	forever := make(chan bool)
 
 	mqSession := rgc.NewQueue("amqp://admin:admin@192.168.1.100:5672/render_mq", "Test")
@@ -40,6 +41,10 @@ func main() {
 	go tc.StartConsumer()
 
 	<-forever
+
+	//publisher
+	message:="hello world"
+	mqSession.Send(message)
 }
 
 
