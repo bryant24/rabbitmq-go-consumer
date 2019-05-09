@@ -11,7 +11,7 @@ you'll never worry about connection lost when receive message from rabbitmq
 ### Installation
 
 ```
-go get github.com/bryant24/rabbit-go-consumer
+go get github.com/bryant24/rabbitmq-go-consumer
 ```
 
 
@@ -24,7 +24,7 @@ package main
 
 import (
 	"fmt"
-	rgc "github.com/bryant24/rabbit-go-consumer"
+	rgc "github.com/bryant24/rabbitmq-go-consumer"
 )
 
 func main() {
