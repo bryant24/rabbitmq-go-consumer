@@ -32,8 +32,8 @@ func NewQueue(url string, qName string) *Mqueue {
 	return q
 }
 
-func (q *Mqueue) Send(message string) {
-	err := q.channel.Publish("", // exchange
+func (q *Mqueue) Send(message string) (err error) {
+	err = q.channel.Publish("", // exchange
 		q.Name, // routing key
 		false,  // mandatory
 		false,  // immediate
@@ -44,6 +44,7 @@ func (q *Mqueue) Send(message string) {
 	if err != nil {
 		logError("Queue declaration failed", err)
 	}
+	return
 }
 
 func (q *Mqueue) Consume(consumer messageConsumer) {
